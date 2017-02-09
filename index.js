@@ -10,7 +10,7 @@ AWS.config.update({
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 var table = "endleg-main";
-var column = "fighflag";
+var column = "fightflag";
 var flag = 1;
 
 // Read all ready-to-fight users
@@ -31,7 +31,7 @@ function onScan(err, data) {
     if (err) {
         console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
     } else {
-        // print all the movies
+        // print all fight wanting users
         console.log("Scan succeeded.");
         data.Items.forEach(function(data) {
            console.log(
