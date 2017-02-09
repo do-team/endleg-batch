@@ -12,13 +12,6 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 var table = "endleg-main";
 var flag = 1;
 
-var params = {
-    TableName:table,
-    Key:{
-        "fightflag": flag
-    }
-};
-
 // Read all ready-to-fight users
 
 var params = {
@@ -38,7 +31,7 @@ docClient.query(params, function(err, data) {
     } else {
         console.log("Query succeeded.");
         data.Items.forEach(function(item) {
-            console.log(" -", item.year + ": " + item.title);
+            console.log(" -", item.user + ": " + item.fightflag);
         });
     }
 });
