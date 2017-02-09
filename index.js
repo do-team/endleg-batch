@@ -21,13 +21,28 @@ var params = {
 
 // Read all ready-to-fight users
 
-console.log("Reading fighting participants...");
-docClient.get(params, function(err, data) {
+var params = {
+    TableName : table,
+    KeyConditionExpression: "#flag = :f",
+    ExpressionAttributeNames:{
+        "#flag": "fightflag"
+    },
+    ExpressionAttributeValues: {
+        ":f":flag
+    }
+};
+
+docClient.query(params, function(err, data) {
     if (err) {
-        console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 0));
+        console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
     } else {
-        console.log("Added item:", JSON.stringify(data, null, 0));
+        console.log("Query succeeded.");
+        data.Items.forEach(function(item) {
+            console.log(" -", item.year + ": " + item.title);
+        });
     }
 });
+
+
 
 };
