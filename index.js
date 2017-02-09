@@ -10,31 +10,44 @@ AWS.config.update({
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 var table = "endleg-main";
+var column = "fighflag";
 var flag = 1;
 
 // Read all ready-to-fight users
 
 var params = {
-    TableName : table,
-    KeyConditionExpression: "#flag = :f",
-    ExpressionAttributeNames:{
-        "#flag": "fightflag"
-    },
+    TableName: table,                       /* The DynamoDB table to connect to */
+    ProjectionExpression: column,           /* The column(s) we want to be returned */
+    FilterExpression: "fight = :vlajka",    /* Search term; in this case return rows whose Ansi column value equals 'fight' */
     ExpressionAttributeValues: {
-        ":f":flag
+         ":vlajka": flag                     /* Search value 'fight' substituted into the search term where :vlajka is found */
     }
 };
 
-docClient.query(params, function(err, data) {
+console.log("Scanning main table.");
+docClient.scan(params, onScan);
+
+function onScan(err, data) {
     if (err) {
-        console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
     } else {
-        console.log("Query succeeded.");
-        data.Items.forEach(function(item) {
-            console.log(" -", item.user + ": " + item.fightflag);
+        // print all the movies
+        console.log("Scan succeeded.");
+        data.Items.forEach(function(data) {
+           console.log(
+                data.user + ": ",
+                data.fightflag);
         });
+
+        // continue scanning if we have more movies, because
+        // scan can retrieve a maximum of 1MB of data
+        if (typeof data.LastEvaluatedKey != "undefined") {
+            console.log("Scanning for more...");
+            params.ExclusiveStartKey = data.LastEvaluatedKey;
+            docClient.scan(params, onScan);
+        }
     }
-});
+}
 
 
 
