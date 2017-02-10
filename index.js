@@ -40,15 +40,30 @@ function onScan(err, data) {
 
         // randomise array - this is almost certainly wrong!
 
-        var randomArray = shuffle.data(data.Items);
+        var randomArray = shuffle(data.Items);
         //
 
-        console.log(randomArray);
+        //console.log(randomArray);
         console.log("Scan succeeded.");
+        // tohle pujde do kinesis
+        var odd = false;
+        var tupple = [];
+
         randomArray.forEach(function(data) {
+            tupple.push(data)
+            if (odd === true) {
+            console.log(tupple); // SEND TO KINESIS
+
+            tupple = [];
+
+           }
+           odd = !odd;
+
+           /*
            console.log(
                 data.name + ": ",
                 data.fightflag);
+            */
         });
 
         // continue scanning if we have more users, because
