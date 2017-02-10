@@ -17,7 +17,7 @@ var flag = 1;
 
 var params = {
     TableName: table,                       /* The DynamoDB table to connect to */
-//    ProjectionExpression: column,           /* The column(s) we want to be returned - in case you want ONLY some columns - we want them all, full object! */
+    //ProjectionExpression: column,           /* The column(s) we want to be returned - in case you want ONLY some columns - we want them all, full object! */
     FilterExpression: "fightflag = :flag",    /* Search term; in this case return rows whose Ansi column value equals 'fightflag' */
     ExpressionAttributeValues: {
          ":flag": flag                     /* Search value 'flag' substituted into the search term where :vlajka is found */
@@ -38,14 +38,14 @@ function onScan(err, data) {
     } else {
         // print all fight-wanting users
 
-        // randomise array
+        // randomise array - this is almost certainly wrong!
 
-        shuffle.array(err, data);
-        // This is almost certainly wrong!
+        var randomArray = shuffle.data(data.Items);
+        //
 
-        console.log(data);
+        console.log(randomArray);
         console.log("Scan succeeded.");
-        data.Items.forEach(function(data) {
+        randomArray.forEach(function(data) {
            console.log(
                 data.name + ": ",
                 data.fightflag);
