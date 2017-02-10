@@ -17,24 +17,35 @@ var flag = 1;
 
 var params = {
     TableName: table,                       /* The DynamoDB table to connect to */
-//    ProjectionExpression: column,           /* The column(s) we want to be returned - in case you want ONLY some columns - we want them all, full object! */
+    //ProjectionExpression: column,           /* The column(s) we want to be returned - in case you want ONLY some columns - we want them all, full object! */
     FilterExpression: "fightflag = :flag",    /* Search term; in this case return rows whose Ansi column value equals 'fightflag' */
     ExpressionAttributeValues: {
          ":flag": flag                     /* Search value 'flag' substituted into the search term where :vlajka is found */
     }
 };
 
+
 console.log("Scanning main table.");
+
+
 docClient.scan(params, onScan);
+
+
 
 function onScan(err, data) {
     if (err) {
         console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
     } else {
         // print all fight-wanting users
-        console.log(data);
+
+        // randomise array - this is almost certainly wrong!
+
+        var randomArray = shuffle.data(data.Items);
+        //
+
+        console.log(randomArray);
         console.log("Scan succeeded.");
-        data.Items.forEach(function(data) {
+        randomArray.forEach(function(data) {
            console.log(
                 data.name + ": ",
                 data.fightflag);
@@ -50,6 +61,23 @@ function onScan(err, data) {
     }
 }
 
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
 
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
 
 };
