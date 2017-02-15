@@ -1,98 +1,48 @@
-var AWS = require('aws-sdk');
+var AWS = require("aws-sdk");
+var nJwt = require('njwt');
 
 exports.handler = (event, context, callback) => {
+
+console.log('Request Headers:', event.headers);
+var zkouska = event.headers;
+var token = zkouska.sectoken;
+console.log('token: ', token);
+nJwt.verify(token, "secret", 'HS512');
 
 AWS.config.update({
   region: "eu-central-1",
   endpoint: "dynamodb.eu-central-1.amazonaws.com"
 });
 
+var dynamodb = new AWS.DynamoDB();
+console.log("Tohle je v contextu: ", context);
+var incoming = event;
+console.log("Tohle je v eventu: ", incoming);
+
+// Params validation goes here - to check, if user is not sending cards out of range.
+var params = {
+        TableName: "endleg-main",
+        Item: {
+            "user": incoming.user,
+            "name": incoming.name,
+            "card1": incoming.card1,
+            "card2": incoming.card2,
+            "card3": incoming.card3,
+            "card4": incoming.card4,
+            "card5": incoming.card5,
+            "fightflag": 1
+        }
+    };
+
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-var table = "endleg-main";
-var column = "fightflag";
-var flag = 1;
-
-// Read all ready-to-fight users
-
-var params = {
-    TableName: table,                       /* The DynamoDB table to connect to */
-    //ProjectionExpression: column,           /* The column(s) we want to be returned - in case you want ONLY some columns - we want them all, full object! */
-    FilterExpression: "fightflag = :flag",    /* Search term; in this case return rows whose Ansi column value equals 'fightflag' */
-    ExpressionAttributeValues: {
-         ":flag": flag                     /* Search value 'flag' substituted into the search term where :vlajka is found */
-    }
-};
-
-
-console.log("Scanning main table.");
-
-
-docClient.scan(params, onScan);
-
-
-
-function onScan(err, data) {
-    if (err) {
-        console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
-    } else {
-        // print all fight-wanting users
-
-        // randomise array - this is almost certainly wrong!
-
-        var randomArray = shuffle(data.Items);
-        //
-
-        //console.log(randomArray);
-        console.log("Scan succeeded.");
-        // tohle pujde do kinesis
-        var odd = false;
-        var tupple = [];
-
-        randomArray.forEach(function(data) {
-            tupple.push(data)
-            if (odd === true) {
-            console.log(tupple); // SEND TO KINESIS
-
-            tupple = [];
-
-           }
-           odd = !odd;
-
-           /*
-           console.log(
-                data.name + ": ",
-                data.fightflag);
-            */
-        });
-
-        // continue scanning if we have more users, because
-        // scan can retrieve a maximum of 1MB of data
-        if (typeof data.LastEvaluatedKey != "undefined") {
-            console.log("Scanning for more...");
-            params.ExclusiveStartKey = data.LastEvaluatedKey;
-            docClient.scan(params, onScan);
-        }
-    }
-}
-
-function shuffle(array) {
-  var currentIndex = array.length, temporaryValue, randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
+docClient.put(params, function(err, data) {
+       if (err) {
+           console.log(err);
+           console.error("Unable to add new items from user ", incoming.user, ". Error JSON:", JSON.stringify(err, null, 2));
+       } else {
+           console.log("Request by user", incoming.user, " was successfully added.");
+       }
+    });
 
 };
