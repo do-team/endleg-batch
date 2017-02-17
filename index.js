@@ -62,7 +62,7 @@ function onScan(err, data) {
                 Message: JSON.stringify(tupple)
             }, function(err, data) {
                 if(err) {
-                    console.error('error publishing to SNS');
+                    console.error('error publishing to SNS', err);
                     //context.fail(err);
                 } else {
                     console.info('message published to SNS');
