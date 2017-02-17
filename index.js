@@ -63,8 +63,12 @@ function onScan(err, data) {
             }, function(err, data) {
                 if(err) {
                     console.error('error publishing to SNS', err);
-                    //context.fail(err);
-                } else {
+                            console.log("SNS publish error")
+                            console.log(err, err.stack)
+                            console.log(data, data)
+                            console.log("RETRY PARAMS:" + params);
+                            }
+                    else {
                     console.info('message published to SNS');
                     //context.done(null, data);
                 }
