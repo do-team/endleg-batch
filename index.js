@@ -51,12 +51,24 @@ function onScan(err, data) {
             if (odd === true) {
             console.log(tupple); // This will be sent to SNS.
             var sns = new AWS.SNS();
-            var params = {
-                    Message: tupple,
-                    Subject: "Clash of Legends!",
-                    TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
-                };
-            sns.publish(params);
+            //var message = JSON.stringify(tupple, null, 2);
+            //var params = {
+            //        Message: message,
+            //        Subject: "Clash of Legends!",
+            //        TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
+            //    };
+            sns.publish({
+                TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
+                Message: JSON.stringify(tupple)
+            }, function(err, data) {
+                if(err) {
+                    console.error('error publishing to SNS');
+                    //context.fail(err);
+                } else {
+                    console.info('message published to SNS');
+                    //context.done(null, data);
+                }
+            });
             tupple = [];
 
            }
