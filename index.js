@@ -49,8 +49,14 @@ function onScan(err, data) {
         randomArray.forEach(function(data) {
             tupple.push(data)
             if (odd === true) {
-            console.log(tupple); // SEND TO KINESIS
-
+            console.log(tupple); // This will be sent to SNS.
+            var sns = new AWS.SNS();
+            var params = {
+                    Message: tupple,
+                    Subject: "Clash of Legends!",
+                    TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
+                };
+            sns.publish(params);
             tupple = [];
 
            }
