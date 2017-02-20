@@ -57,34 +57,15 @@ function onScan(err, data) {
                     Subject: "Clash of Legends!",
                     TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
                 };
-//            sns.publish({
-//                //TargetArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash:bfc26707-5713-4e43-810c-7fce5e65749e",
-//                TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
-//                //Message: JSON.stringify(tupple)
-//                Message: "test",
-//            }, function(err, data) {
-//                if(err) {
-//                    console.error('error publishing to SNS', err);
-//                            console.log("SNS publish error")
-//                            console.log(err, err.stack)
-//                            console.log(data, data)
-//                            console.log("RETRY PARAMS:" + params);
-//                            }
-//                    else {
-//                    console.info('message published to SNS');
-//                    //context.done(null, data);
-//                }
-//            });
+            sns.publish(params, function (err, data){
+                if(err) { console.log('ERROR PUBLISHING SNS: ', err);}
+                else {console.log('Message published to SNS topic...');
+                }
+            });
             tupple = [];
-
            }
            odd = !odd;
 
-           /*
-           console.log(
-                data.name + ": ",
-                data.fightflag);
-            */
         });
 
         // continue scanning if we have more users, because
