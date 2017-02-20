@@ -4,7 +4,7 @@ exports.handler = (event, context, callback) => {
 
 AWS.config.update({
   region: "eu-central-1",
-  endpoint: "dynamodb.eu-central-1.amazonaws.com"
+//  endpoint: "dynamodb.eu-central-1.amazonaws.com" // This was in conflict with SNS endpoint!
 });
 
 var docClient = new AWS.DynamoDB.DocumentClient();
@@ -51,30 +51,30 @@ function onScan(err, data) {
             if (odd === true) {
             console.log(tupple); // This will be sent to SNS.
             var sns = new AWS.SNS();
-            //var message = JSON.stringify(tupple, null, 2);
-            //var params = {
-            //        Message: message,
-            //        Subject: "Clash of Legends!",
-            //        TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
-            //    };
-            sns.publish({
-                TargetArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
-                TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
-                //Message: JSON.stringify(tupple)
-                Message: "test",
-            }, function(err, data) {
-                if(err) {
-                    console.error('error publishing to SNS', err);
-                            console.log("SNS publish error")
-                            console.log(err, err.stack)
-                            console.log(data, data)
-                            console.log("RETRY PARAMS:" + params);
-                            }
-                    else {
-                    console.info('message published to SNS');
-                    //context.done(null, data);
-                }
-            });
+            var message = JSON.stringify(tupple, null, 2);
+            var params = {
+                    Message: message,
+                    Subject: "Clash of Legends!",
+                    TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
+                };
+//            sns.publish({
+//                //TargetArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash:bfc26707-5713-4e43-810c-7fce5e65749e",
+//                TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
+//                //Message: JSON.stringify(tupple)
+//                Message: "test",
+//            }, function(err, data) {
+//                if(err) {
+//                    console.error('error publishing to SNS', err);
+//                            console.log("SNS publish error")
+//                            console.log(err, err.stack)
+//                            console.log(data, data)
+//                            console.log("RETRY PARAMS:" + params);
+//                            }
+//                    else {
+//                    console.info('message published to SNS');
+//                    //context.done(null, data);
+//                }
+//            });
             tupple = [];
 
            }
