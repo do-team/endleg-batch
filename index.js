@@ -59,7 +59,8 @@ function onScan(err, data) {
             //    };
             sns.publish({
                 TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
-                Message: JSON.stringify(tupple)
+                //Message: JSON.stringify(tupple)
+                Message: "test",
             }, function(err, data) {
                 if(err) {
                     console.error('error publishing to SNS', err);
