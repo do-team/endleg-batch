@@ -58,6 +58,7 @@ function onScan(err, data) {
             //        TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
             //    };
             sns.publish({
+                TargetArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
                 TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash",
                 //Message: JSON.stringify(tupple)
                 Message: "test",
