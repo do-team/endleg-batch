@@ -4,7 +4,7 @@ exports.handler = (event, context, callback) => {
 
 AWS.config.update({
   region: "eu-central-1",
-  endpoint: "dynamodb.eu-central-1.amazonaws.com"
+//  endpoint: "dynamodb.eu-central-1.amazonaws.com" // This was in conflict with SNS endpoint!
 });
 
 var docClient = new AWS.DynamoDB.DocumentClient();
@@ -36,9 +36,6 @@ function onScan(err, data) {
     if (err) {
         console.error("Unable to scan the table. Error JSON:", JSON.stringify(err, null, 2));
     } else {
-        // print all fight-wanting users
-
-        // randomise array - this is almost certainly wrong!
 
         var randomArray = shuffle(data.Items);
         //
@@ -52,18 +49,23 @@ function onScan(err, data) {
         randomArray.forEach(function(data) {
             tupple.push(data)
             if (odd === true) {
-            console.log(tupple); // SEND TO KINESIS
-
+            console.log(tupple); // This will be sent to SNS.
+            var sns = new AWS.SNS();
+            var message = JSON.stringify(tupple, null, 2);
+            var params = {
+                    Message: message,
+                    Subject: "Clash of Legends!",
+                    TopicArn: "arn:aws:sns:eu-central-1:322653911670:EndLegClash" // Will be replaced by ENV VAR
+                };
+            sns.publish(params, function (err, data){
+                if(err) { console.log('ERROR PUBLISHING SNS: ', err);}
+                else {console.log('Message published to SNS topic...');
+                }
+            });
             tupple = [];
-
            }
            odd = !odd;
 
-           /*
-           console.log(
-                data.name + ": ",
-                data.fightflag);
-            */
         });
 
         // continue scanning if we have more users, because
